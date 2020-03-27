@@ -16,7 +16,10 @@ class ViewController: UIViewController {
 
     
     let source = ["This","is","a","crocodile","man","made","elephant","anddfdsfsd"]
-
+    let sourceOptions = ["Here","we","options","for","user","hence"]
+    
+    @IBOutlet weak var checkButton: UIButton!
+    @IBOutlet weak var optionsWordCollection: UICollectionView!
     @IBOutlet weak var selectedWordsCollection: UICollectionView!
     @IBOutlet weak var speaker: UIButton!
     @IBOutlet weak var foreignLanguageLabel: UILabel!
@@ -28,39 +31,50 @@ class ViewController: UIViewController {
         speaker.layer.borderWidth = 1
         speaker.layer.masksToBounds = false
         speaker.layer.shadowOpacity = 0.9
-        
         speaker.layer.shadowColor = UIColor.systemBlue.cgColor
-            
         speaker.layer.shadowRadius = 0
         speaker.layer.shadowOffset = CGSize(width: 0, height: 5)
+    }
+    
+    func setupDelegateAndDatasource() {
+        selectedWordsCollection.delegate = self
+        selectedWordsCollection.dataSource = self
+        selectedWordsCollection.isScrollEnabled = false
+        optionsWordCollection.delegate = self
+        optionsWordCollection.dataSource = self
+        optionsWordCollection.isScrollEnabled = false
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
         setupSpeakerButton()
-        
-        selectedWordsCollection.delegate = self
-        selectedWordsCollection.dataSource = self
-        selectedWordsCollection.isScrollEnabled = false
-        
+        setupDelegateAndDatasource()
+                
+        optionsWordCollection.collectionViewLayout = CustomLayout()
         selectedWordsCollection.collectionViewLayout = CustomLayout()
     }
 }
 
 extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.source.count
+        
+        return collectionView == self.selectedWordsCollection ? self.source.count : self.sourceOptions.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = selectedWordsCollection.dequeueReusableCell(withReuseIdentifier: "cell1", for: indexPath) as! WordCell
-        cell.textLabel.text = self.source[indexPath.row]
+        
+        let datasource = collectionView.tag == 1 ? source : sourceOptions
+        let cellId = collectionView.tag == 1 ? "cell1" : "cell2"
+                
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! WordCell
+        
+        cell.textLabel.text = datasource[indexPath.row]
         
         let size = CGSize(width: 250, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
-        let estimatedFrame = NSString(string: self.source[indexPath.row]).boundingRect(with: size, options: options, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 18)], context: nil)
+        let estimatedFrame = NSString(string: datasource[indexPath.row]).boundingRect(with: size, options: options, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 18)], context: nil)
 
         cell.textLabel.frame = CGRect(x: 0, y: 0, width: estimatedFrame.width+kDefaultCellPadding, height: cell.textLabel.frame.height)
         
@@ -68,7 +82,6 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
         
         let size = CGSize(width: 250, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
