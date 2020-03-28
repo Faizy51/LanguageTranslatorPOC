@@ -51,8 +51,8 @@ class ViewController: UIViewController {
         setupSpeakerButton()
         setupDelegateAndDatasource()
                 
-        optionsWordCollection.collectionViewLayout = CustomLayout()
-        selectedWordsCollection.collectionViewLayout = CustomLayout()
+        selectedWordsCollection.collectionViewLayout = LeftAlignedCollectionViewFlowLayout()
+        optionsWordCollection.collectionViewLayout = CenterAlignedCollectionViewFlowLayout()
     }
 }
 
@@ -60,7 +60,7 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return collectionView == self.selectedWordsCollection ? self.source.count : self.sourceOptions.count
+        return collectionView.tag == 1 ? self.source.count : self.sourceOptions.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -83,9 +83,11 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
+        let datasource = collectionView.tag == 1 ? source : sourceOptions
+
         let size = CGSize(width: 250, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
-        let estimatedFrame = NSString(string: self.source[indexPath.row]).boundingRect(with: size, options: options, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 18)], context: nil)
+        let estimatedFrame = NSString(string: datasource[indexPath.row]).boundingRect(with: size, options: options, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 18)], context: nil)
 
         let finalWidth = estimatedFrame.width+kDefaultCellPadding < kMinimumCellWidth ? kMinimumCellWidth : estimatedFrame.width+kDefaultCellPadding
         
@@ -95,33 +97,3 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     
 }
 
-// For left aligned collection view cells.
-class CustomLayout: UICollectionViewFlowLayout {
-
-    required override init() {super.init(); common()}
-    required init?(coder aDecoder: NSCoder) {super.init(coder: aDecoder); common()}
-
-    private func common() {
-//        estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        minimumLineSpacing = 10
-        minimumInteritemSpacing = 10
-    }
-
-    override func layoutAttributesForElements(
-                    in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-
-        guard let att = super.layoutAttributesForElements(in:rect) else {return []}
-        var x: CGFloat = sectionInset.left
-        var y: CGFloat = -1.0
-
-        for a in att {
-            if a.representedElementCategory != .cell { continue }
-
-            if a.frame.origin.y >= y { x = sectionInset.left }
-            a.frame.origin.x = x
-            x += a.frame.width + minimumInteritemSpacing
-            y = a.frame.maxY
-        }
-        return att
-    }
-}

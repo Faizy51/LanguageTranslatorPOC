@@ -14,6 +14,7 @@
 		1896A4F8242B997600A3E938 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1896A4F7242B997600A3E938 /* Assets.xcassets */; };
 		1896A4FB242B997600A3E938 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1896A4F9242B997600A3E938 /* LaunchScreen.storyboard */; };
 		1896A503242BA1F800A3E938 /* WordCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1896A502242BA1F800A3E938 /* WordCell.swift */; };
+		1896A505242F1DAD00A3E938 /* CustomFlowLayouts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1896A504242F1DAD00A3E938 /* CustomFlowLayouts.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		1896A4FA242B997600A3E938 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1896A4FC242B997600A3E938 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1896A502242BA1F800A3E938 /* WordCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordCell.swift; sourceTree = "<group>"; };
+		1896A504242F1DAD00A3E938 /* CustomFlowLayouts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFlowLayouts.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				1896A4F7242B997600A3E938 /* Assets.xcassets */,
 				1896A4F9242B997600A3E938 /* LaunchScreen.storyboard */,
 				1896A4FC242B997600A3E938 /* Info.plist */,
+				1896A504242F1DAD00A3E938 /* CustomFlowLayouts.swift */,
 			);
 			path = BlueDomain;
 			sourceTree = "<group>";
@@ -144,6 +147,7 @@
 				1896A4F3242B997300A3E938 /* ViewController.swift in Sources */,
 				1896A503242BA1F800A3E938 /* WordCell.swift in Sources */,
 				1896A4EF242B997300A3E938 /* AppDelegate.swift in Sources */,
+				1896A505242F1DAD00A3E938 /* CustomFlowLayouts.swift in Sources */,
 				1896A4F1242B997300A3E938 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
