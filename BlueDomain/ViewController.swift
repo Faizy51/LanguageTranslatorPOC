@@ -13,10 +13,18 @@ class ViewController: UIViewController {
     // Constants
     fileprivate let kMinimumCellWidth: CGFloat = 55.0
     fileprivate let kDefaultCellPadding: CGFloat = 20
+    fileprivate let kAlertViewFrameConstant: CGFloat = 160
 
+    let translationsDict = [
+        "Bonjour": "good morning",
+        "quel est votre nom": "what is your name",
+        "Comment ça va": "how are you",
+        "Comment est la vie": "how is life",
+        "je vais bien": "I am fine",
+    ]
     
-    let source = ["This","is","a","crocodile","man","made","elephant","anddfdsfsd"]
-    let sourceOptions = ["Here","we","options","for","user","hence"]
+    var source:[String] = []
+    var sourceOptions: [String] = []
     
     @IBOutlet weak var checkButton: UIButton!
     @IBOutlet weak var optionsWordCollection: UICollectionView!
@@ -24,14 +32,47 @@ class ViewController: UIViewController {
     @IBOutlet weak var speaker: UIButton!
     @IBOutlet weak var foreignLanguageLabel: UILabel!
     
+    var alertView: UIView {
+        let aView = UIView(frame: CGRect(x: self.view.frame.minX, y: self.view.frame.maxY-kAlertViewFrameConstant, width: self.view.frame.width, height: kAlertViewFrameConstant))
+        aView.backgroundColor = UIColor(red:0.85, green:1.00, blue:0.72, alpha:1.00)
+        
+        let label = UILabel(frame: CGRect(x: 17, y: 20, width: self.view.frame.width, height: 30))
+        let labelColor = UIColor(red:0.35, green:0.65, blue:0.00, alpha:1.00)
+        label.text = "You are correct"
+        label.textColor = labelColor
+        label.font = UIFont(name: "ArialHebrew-Bold", size: 30)
+        
+        let imageView = UIImageView(frame: CGRect(x: self.view.frame.maxX-50, y: 20, width: 25, height: 25))
+        let image = UIImage(systemName: "checkmark.square.fill")
+        imageView.tintColor = labelColor
+        imageView.image = image
+        
+        aView.addSubview(imageView)
+        aView.addSubview(label)
+        
+        return aView
+    }
+    
+    @IBAction func checkAnswer(_ sender: Any) {
+        
+        let question = foreignLanguageLabel.text ?? ""
+        let answer = source.joined(separator: " ")
+        
+        if translationsDict[question] == answer {
+            self.view.insertSubview(self.alertView, belowSubview: self.checkButton)
+            checkButton.setTitle("CONTINUE", for: .normal)
+            checkButton.isEnabled = false
+        }
+    }
     
     func setupSpeakerButton() {
         speaker.layer.cornerRadius = 15
+        speaker.backgroundColor = UIColor(red:0.13, green:0.69, blue:0.97, alpha:1.00)
         speaker.layer.borderColor = UIColor.clear.cgColor
         speaker.layer.borderWidth = 1
         speaker.layer.masksToBounds = false
         speaker.layer.shadowOpacity = 0.9
-        speaker.layer.shadowColor = UIColor.systemBlue.cgColor
+        speaker.layer.shadowColor = UIColor(red:0.09, green:0.60, blue:0.84, alpha:1.00).cgColor
         speaker.layer.shadowRadius = 0
         speaker.layer.shadowOffset = CGSize(width: 0, height: 5)
     }
@@ -45,14 +86,37 @@ class ViewController: UIViewController {
         optionsWordCollection.isScrollEnabled = false
     }
     
+    func setupCheckButton() {
+        checkButton.backgroundColor = UIColor(red:0.35, green:0.80, blue:0.01, alpha:1.00)
+        checkButton.layer.masksToBounds = false
+        checkButton.layer.shadowColor = UIColor(red:0.35, green:0.66, blue:0.01, alpha:1.00).cgColor
+        checkButton.layer.shadowOpacity = 1
+        checkButton.layer.shadowRadius = 0
+        checkButton.layer.shadowOffset = CGSize(width: 0, height: 3)
+
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         setupSpeakerButton()
+        setupCheckButton()
         setupDelegateAndDatasource()
                 
         selectedWordsCollection.collectionViewLayout = LeftAlignedCollectionViewFlowLayout()
         optionsWordCollection.collectionViewLayout = CenterAlignedCollectionViewFlowLayout()
+        
+        let randomElement = translationsDict.randomElement()
+        foreignLanguageLabel.text = randomElement?.key
+        
+        self.sourceOptions = randomElement!.value.components(separatedBy: " ")
+        
+        let allValues = translationsDict.reduce([]) { (result, keyAndValue) in
+            return result + keyAndValue.value.components(separatedBy: " ")
+        }
+        self.sourceOptions.append(contentsOf: allValues[0...8])
+        self.sourceOptions = Array(Set(self.sourceOptions))
+        self.sourceOptions.shuffle()
     }
 }
 
@@ -95,5 +159,59 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
         
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
+        // Disable selection for first collectionView
+        if collectionView.tag == 1 { return }
+        // Make cell grey
+        let cell = collectionView.cellForItem(at: indexPath) as! WordCell
+        let cellToAnimate = cell.copyView() as? WordCell
+        
+        cell.textLabel.isHidden = true
+        
+        UIView.animate(withDuration: 1, animations: {
+            cell.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1)
+            cell.layer.borderWidth = 0
+            cell.layer.shadowOpacity = 0
+        }, completion: nil)
+        
+    
+        // Update Datasource of first collectionView
+        // Insert item into first collectionView
+        source.append(cell.textLabel.text!)
+        let newIndexPath = IndexPath(row:source.count-1, section:0)
+        selectedWordsCollection.insertItems(at: [newIndexPath])
+
+        // Animate the cell
+        guard let dummyCell = cellToAnimate else {return}
+        
+        // Fetch the frame of the new cell added to the first collectionView
+        let destinationCell = selectedWordsCollection.cellForItem(at: newIndexPath)
+        destinationCell?.isHidden = true
+        let frameWRTView = selectedWordsCollection.convert(destinationCell!.frame, to: self.view)
+        
+        dummyCell.frame = collectionView.convert(cell.frame, to: self.view)
+        self.view.addSubview(dummyCell)
+        
+        UIView.animate(withDuration: 0.2, animations: {
+            dummyCell.frame = frameWRTView
+        }) { (_) in
+            // Unhide the destination cell and remove the dummyView
+            destinationCell?.isHidden = false
+            dummyCell.removeFromSuperview()
+        }
+        
+        cell.isUserInteractionEnabled = false
+       
+    }
+    
 }
 
+extension UICollectionViewCell {
+func copyView() -> AnyObject {
+    let archivedView = try? NSKeyedArchiver.archivedData(withRootObject: self, requiringSecureCoding: false)
+
+    return try! NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(archivedView!) as AnyObject
+    
+    }
+}

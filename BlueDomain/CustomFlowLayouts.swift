@@ -24,11 +24,12 @@ class LeftAlignedCollectionViewFlowLayout: UICollectionViewFlowLayout {
     override func layoutAttributesForElements(
                     in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
 
-        guard let att = super.layoutAttributesForElements(in:rect) else {return []}
+        guard let superAttributes = super.layoutAttributesForElements(in: rect) else { return nil }
+        guard let attributes = NSArray(array: superAttributes, copyItems: true) as? [UICollectionViewLayoutAttributes] else { return nil }
         var x: CGFloat = sectionInset.left
         var y: CGFloat = -1.0
 
-        for a in att {
+        for a in attributes {
             if a.representedElementCategory != .cell { continue }
 
             if a.frame.origin.y >= y { x = sectionInset.left }
@@ -36,7 +37,7 @@ class LeftAlignedCollectionViewFlowLayout: UICollectionViewFlowLayout {
             x += a.frame.width + minimumInteritemSpacing
             y = a.frame.maxY
         }
-        return att
+        return attributes
     }
 }
 
