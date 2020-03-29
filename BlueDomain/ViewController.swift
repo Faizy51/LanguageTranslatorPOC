@@ -13,7 +13,6 @@ class ViewController: UIViewController {
     // Constants
     fileprivate let kMinimumCellWidth: CGFloat = 55.0
     fileprivate let kDefaultCellPadding: CGFloat = 20
-    fileprivate let kAlertViewFrameConstant: CGFloat = 160
 
     let translationsDict = [
         "Bonjour": "good morning",
@@ -33,14 +32,16 @@ class ViewController: UIViewController {
     @IBOutlet weak var foreignLanguageLabel: UILabel!
     
     var alertView: UIView {
-        let aView = UIView(frame: CGRect(x: self.view.frame.minX, y: self.view.frame.maxY-kAlertViewFrameConstant, width: self.view.frame.width, height: kAlertViewFrameConstant))
+        let calculatedHeight = self.view.frame.height / 6
+        
+        let aView = UIView(frame: CGRect(x: self.view.frame.minX, y: self.view.frame.maxY-calculatedHeight, width: self.view.frame.width, height: calculatedHeight))
         aView.backgroundColor = UIColor(red:0.85, green:1.00, blue:0.72, alpha:1.00)
         
         let label = UILabel(frame: CGRect(x: 17, y: 20, width: self.view.frame.width, height: 30))
         let labelColor = UIColor(red:0.35, green:0.65, blue:0.00, alpha:1.00)
         label.text = "You are correct"
         label.textColor = labelColor
-        label.font = UIFont(name: "ArialHebrew-Bold", size: 30)
+        label.font = UIFont(name: "ArialHebrew-Bold", size: 25)
         
         let imageView = UIImageView(frame: CGRect(x: self.view.frame.maxX-50, y: 20, width: 25, height: 25))
         let image = UIImage(systemName: "checkmark.square.fill")
@@ -114,7 +115,7 @@ class ViewController: UIViewController {
         let allValues = translationsDict.reduce([]) { (result, keyAndValue) in
             return result + keyAndValue.value.components(separatedBy: " ")
         }
-        self.sourceOptions.append(contentsOf: allValues[0...8])
+        self.sourceOptions.append(contentsOf: allValues[0...7])
         self.sourceOptions = Array(Set(self.sourceOptions))
         self.sourceOptions.shuffle()
     }
