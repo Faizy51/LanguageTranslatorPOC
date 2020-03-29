@@ -33,4 +33,19 @@ class WordCell: UICollectionViewCell {
         
     }
     
+    override func dragStateDidChange(_ dragState: UICollectionViewCell.DragState) {
+
+        switch dragState {
+        case .none:
+            self.layer.opacity = 1
+        case .lifting:
+            return
+        case .dragging:
+            self.layer.opacity = 0
+
+        @unknown default:
+            fatalError("Did not implement")
+        }
+    }
+    
 }

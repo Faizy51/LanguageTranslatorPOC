@@ -82,6 +82,10 @@ class ViewController: UIViewController {
         selectedWordsCollection.delegate = self
         selectedWordsCollection.dataSource = self
         selectedWordsCollection.isScrollEnabled = false
+        selectedWordsCollection.dragInteractionEnabled = true
+        selectedWordsCollection.dragDelegate = self
+        selectedWordsCollection.dropDelegate = self
+        
         optionsWordCollection.delegate = self
         optionsWordCollection.dataSource = self
         optionsWordCollection.isScrollEnabled = false
@@ -204,6 +208,52 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
         
         cell.isUserInteractionEnabled = false
        
+    }
+        
+}
+
+extension ViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        let item = self.source[indexPath.row]
+        let itemProvider = NSItemProvider(object: item as NSString)
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+        dragItem.localObject = item
+        
+        return [dragItem]
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
+        return true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        
+        guard let destinationIndexPath = coordinator.destinationIndexPath else {
+          return
+        }
+        
+        coordinator.items.forEach { dropItem in
+            guard let sourceIndexPath = dropItem.sourceIndexPath else {
+                return
+            }
+            collectionView.performBatchUpdates({
+                let word = source[sourceIndexPath.row]
+                source.remove(at: sourceIndexPath.row)
+                source.insert(word, at: destinationIndexPath.row)
+                collectionView.deleteItems(at: [sourceIndexPath])
+                collectionView.insertItems(at: [destinationIndexPath])
+            }, completion: { _ in
+                coordinator.drop(dropItem.dragItem,
+                                 toItemAt: destinationIndexPath)
+            })
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+      return UICollectionViewDropProposal(
+        operation: .move,
+        intent: .insertAtDestinationIndexPath)
     }
     
 }
