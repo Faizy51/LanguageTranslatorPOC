@@ -2,4 +2,4 @@
 UI template for a typical language translation quiz.
 
 ### Preview
-![](preview.gif)
+![](preview1.gif)
